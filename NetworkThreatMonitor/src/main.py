@@ -2,7 +2,7 @@ import psutil
 import os
 import requests
 
-API_KEY = 'd6fcd9a8a708b37f41c1c15665ff727c6a00dfb73dc460ab8fcbdfc971a460e77d0e011bc9efe97e'  # AbuseIPDB API key
+API_KEY = 'test'  # AbuseIPDB API key
 LOG_FILE = 'connections.log'
 
 def get_active_connections():
