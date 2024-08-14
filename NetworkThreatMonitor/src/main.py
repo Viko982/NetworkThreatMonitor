@@ -43,7 +43,7 @@ def save_log(connections, log_file):
             file.write(f"{conn['local_ip']} {conn['local_port']} {conn['remote_ip']} {conn['remote_port']}\n")
     print(f"Debug: Active connections saved to log.")
 
-def check_threat_intelligence(ip):
+def check_threat_intelligence(ip, timeout=7):
     url = f"https://api.abuseipdb.com/api/v2/check"
     headers = {
         'Accept': 'application/json',
@@ -53,8 +53,15 @@ def check_threat_intelligence(ip):
         'ipAddress': ip,
         'maxAgeInDays': '90'
     }
-    response = requests.get(url, headers=headers, params=params)
-    return response.json()
+    try:
+        response = requests.get(url, headers=headers, params=params, timeout=timeout)
+        return response.json()
+    except requests.Timeout:
+        print(f"Request for IP {ip} timed out.")
+        return None
+    except requests.RequestException as e:
+        print(f"An error occurred: {e}")
+        return None
 
 if __name__ == "__main__":
     # Check for active connections
@@ -73,6 +80,7 @@ if __name__ == "__main__":
     for conn in unique_connections:
         ip, port = conn.split(':')
         threat_info = check_threat_intelligence(ip)
-        print(f"IP: {ip}, Threat Info: {threat_info}")
+        if threat_info:
+            print(f"IP: {ip}, Threat Info: {threat_info}")
 
     print(f"Unique connections: {unique_connections}")
